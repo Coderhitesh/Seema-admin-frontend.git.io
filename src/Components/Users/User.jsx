@@ -7,8 +7,9 @@ const User = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get('https://api.camrosteel.com/api/v1/getAllUser');
-        setUsers(response.data);
+        const response = await axios.get('http://localhost:4000/api/All-users');
+        setUsers(response.data.users);
+        console.log(response.data)
       } catch (error) {
         console.error('Error fetching users:', error);
       }
@@ -23,20 +24,22 @@ const User = () => {
       <table className="min-w-full divide-y divide-gray-200">
         <thead className="bg-gray-50">
           <tr>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Id</th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact Number</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created At</th>
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
-          {users.map(user => (
+          {users.reverse().map(user => (
             <tr key={user._id}>
-              <td className="px-6 py-4 whitespace-nowrap">{user.Name}</td>
-              <td className="px-6 py-4 whitespace-nowrap">{user.Email}</td>
-              <td className="px-6 py-4 whitespace-nowrap">{user.ContactNumber}</td>
-              <td className="px-6 py-4 whitespace-nowrap">{user.Role}</td>
+              <td className="px-6 py-4 whitespace-nowrap">{user._id}</td>
+              <td className="px-6 py-4 whitespace-nowrap">{user.name}</td>
+              <td className="px-6 py-4 whitespace-nowrap">{user.email}</td>
+
+
+              {/* <td className="px-6 py-4 whitespace-nowrap">{user.ContactNumber}</td>
+              <td className="px-6 py-4 whitespace-nowrap">{user.Role}</td> */}
               <td className="px-6 py-4 whitespace-nowrap">{new Date(user.createdAt).toLocaleString()}</td>
             </tr>
           ))}

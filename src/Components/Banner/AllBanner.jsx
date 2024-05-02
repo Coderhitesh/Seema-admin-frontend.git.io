@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { Link } from "react-router-dom";
 
 const AllBanner = () => {
   const [banners, setBanners] = useState([]);
@@ -58,7 +59,12 @@ useEffect(()=>{
 
   return (
     <div className="container mx-auto min-h-screen py-8">
-      <h1 className="text-2xl font-bold mb-4">Banners</h1>
+       <div className="mb-4 flex justify-between items-center">
+                <h2 className="text-2xl font-bold">Banners</h2>
+                <Link to="/Create-Banner" className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
+                    + Add Banners
+                </Link>
+            </div>
       <table className="w-[1370px] border-collapse border border-gray-300">
         <thead>
           <tr className="bg-gray-100">
