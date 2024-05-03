@@ -91,7 +91,7 @@ const CreateProduct = () => {
       console.error('Invalid discount percentage.');
     }
   };
-  
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -115,7 +115,7 @@ const CreateProduct = () => {
 
     try {
       // Make Axios request
-      const response = await axios.post('http://localhost:4000/api/create-products', formData, {
+      const response = await axios.post('https://www.api.naturalcottoncollection.com/api/create-products', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -131,7 +131,7 @@ const CreateProduct = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('https://api.camrosteel.com/api/v1/get-tags');
+        const response = await axios.get('https://www.api.naturalcottoncollection.com/api/get-tags');
         setTags(response.data.data);
 
       } catch (error) {
@@ -141,6 +141,26 @@ const CreateProduct = () => {
     };
 
     fetchData();
+  }, []);
+  const [categories, setCategories] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchDataCat = async () => {
+      try {
+        const response = await axios.get('https://www.api.naturalcottoncollection.com/api/get-category');
+        console.log(response.data.data)
+        setCategories(response.data.data);
+
+
+        setIsLoading(false);
+      } catch (error) {
+        console.error('Failed to fetch categories:', error);
+        setIsLoading(false); // Update loading state even if there's an error
+      }
+    };
+
+    fetchDataCat();
   }, []);
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
@@ -185,9 +205,20 @@ const CreateProduct = () => {
           <input type="text" name="categories" value={formdata.categories} onChange={handleChange} placeholder='Categories' className="block w-full border-[1px] p-2 mt-1 rounded-md border-gray-900 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50" />
           <input type="text" value={formdata.SKU} onChange={handleChange} name="sku" placeholder="SKU" className="block w-full border-[1px] p-2 mt-1 rounded-md border-gray-900 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50" />
         </div> */}
-        <div className='flex gap-2'>
-          <input type="text" name="categories" value={formdata.categories} onChange={handleChange} placeholder='Categories' className="block w-full border-[1px] p-2 mt-1 rounded-md border-gray-900 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50" />
-          <input type="text" value={formdata.SKU} onChange={handleChange} name="SKU" placeholder="SKU" className="block w-full border-[1px] p-2 mt-1 rounded-md border-gray-900 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50" />
+        <div className='flex gap-2 justify-between'>
+
+          <select onChange={handleChange} value={formdata.categories} name="categories" className='block w-[49%] border-[1px] p-2 mt-1 rounded-md border-gray-900 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50' id="">
+            <option value="">---select category---</option>
+            {categories && categories.map((item, index) => (
+              <option key={index} value={item.title}>
+                {item.title}
+              </option>
+            ))}
+          </select>
+
+
+          {/* <input type="text" name="categories" value={formdata.categories}} placeholder='Categories' className="block w-full border-[1px] p-2 mt-1 rounded-md border-gray-900 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50" /> */}
+          <input type="text" value={formdata.SKU} onChange={handleChange} name="SKU" placeholder="SKU" className="block w-[49%] border-[1px] p-2 mt-1 rounded-md border-gray-900 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50" />
         </div>
         <div className="mb-4">
 
@@ -211,21 +242,7 @@ const CreateProduct = () => {
                     placeholder="Size"
                     className="block w-full border-[1px] p-2 mt-1 rounded-md border-gray-900 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
                   />
-                  <input
-                    type="text"
-                    name={`sizes[${index}].discountPrice`}
-                    value={size.discountPrice}
-                    onChange={(e) =>
-                      setFormdata((prevState) => ({
-                        ...prevState,
-                        sizes: prevState.sizes.map((s, i) =>
-                          i === index ? { ...s, discountPrice: e.target.value } : s
-                        ),
-                      }))
-                    }
-                    placeholder="Discount Price"
-                    className="block w-full border-[1px] p-2 mt-1 rounded-md border-gray-900 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
-                  />
+
                   <input
                     type="text"
                     name={`sizes[${index}].mainPrice`}
@@ -239,6 +256,22 @@ const CreateProduct = () => {
                       }))
                     }
                     placeholder="Main Price"
+                    className="block w-full border-[1px] p-2 mt-1 rounded-md border-gray-900 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+                  />
+
+                  <input
+                    type="text"
+                    name={`sizes[${index}].discountPrice`}
+                    value={size.discountPrice}
+                    onChange={(e) =>
+                      setFormdata((prevState) => ({
+                        ...prevState,
+                        sizes: prevState.sizes.map((s, i) =>
+                          i === index ? { ...s, discountPrice: e.target.value } : s
+                        ),
+                      }))
+                    }
+                    placeholder="Discount Price"
                     className="block w-full border-[1px] p-2 mt-1 rounded-md border-gray-900 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
                   />
 

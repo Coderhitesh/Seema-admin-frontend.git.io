@@ -18,7 +18,7 @@ const CategorySlider = () => {
     const handleCategories= async()=>{
         try {
 
-            const response = await axios.get("https://api.camrosteel.com/api/v1/getAllCategorey")
+            const response = await axios.get("https://www.api.naturalcottoncollection.com/api/getAllCategorey")
             console.log(response.data);
             setCateg(response.data)
         } catch (error) {

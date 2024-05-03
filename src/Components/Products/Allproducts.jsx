@@ -11,7 +11,7 @@ const Allproducts = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          "https://diva-backend-7ji5.onrender.com/api/get-products"
+          "https://www.api.naturalcottoncollection.com/api/get-products"
         );
         setProducts(response.data.data.reverse());
         console.log(response.data.data);
@@ -26,7 +26,7 @@ const Allproducts = () => {
 
   const handleDelete = async (id) => {
     try {
-      const res = await axios.delete(`https://diva-backend-7ji5.onrender.com/api/delete-products/${id}`)
+      const res = await axios.delete(`https://www.api.naturalcottoncollection.com/api/delete-products/${id}`)
       console.log(res.data)
       setProducts(products.filter(products => products._id !== id));
     } catch (error) {
@@ -77,7 +77,7 @@ const Allproducts = () => {
                 <img src={product.img} alt={product.productName} className=" h-ful w-full object-cover" />
 
               </td>
-              <td className="border w-[150px] text-blue-400 underline  border-gray-300 px-2 "><Link to={`/EditProducts/${product._id}`}>{product.productName}</Link></td>
+              <td className="border w-[150px] text-blue-400 underline  border-gray-300 px-2 "><Link to={`/EditProducts/${product.collectionName}/${product._id}`}>{product.productName}</Link></td>
               <td className="border  w-[80px]  text-black  border-gray-300 px-2">{product.mainPrice}</td>
               <td className="border text-black w-[80px]    border-gray-300 px-2">{product.percentage}</td>
               <td className="border w-20 text-nowrap text-black  border-gray-300 px-2">{product.collectionName}</td>

@@ -9,7 +9,7 @@ const AllCategories = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:4000/api/get-category');
+        const response = await axios.get('https://www.api.naturalcottoncollection.com/api/get-category');
       
           setCategories(response.data.data);
 
@@ -32,7 +32,7 @@ const AllCategories = () => {
 
   const handleDeleteCategory = async (id) => {
     try {
-      const response = await axios.post(`http://localhost:4000/api/delete-category/${id}`);
+      const response = await axios.post(`https://www.api.naturalcottoncollection.com/api/delete-category/${id}`);
       console.log('Category deleted successfully:', id);
       console.log(response.data);
       fetchData();

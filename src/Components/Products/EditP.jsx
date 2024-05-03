@@ -3,240 +3,386 @@ import axios from 'axios';
 import ImageModal from './ImageModal';
 import { Link, useParams } from 'react-router-dom';
 import toast from 'react-hot-toast'
-const EditPoject = () => {
-    const {id} = useParams()
-  const [formData, setFormData] = useState({
-    productName: "",
-    property: "",
-    originalPrice: "",
-    discoPrice: "",
-    vendor: "",
-    sizes: [],
-    sku: "",
-    available: true,
-    productType: "",
-    Desc: "",
-    Category: "",
-    addInfo: {
-      base: "",
-      material: "",
-      dishwasherSafe: "",
-      packageContent: "",
-      warranty: 0,
-      certification: "",
-    },
+const EditProject = () => {
+  const [mainData, setMainData] = useState([])
+  const { id, name } = useParams()
 
-    images: [],
+
+
+
+  const [formdata, setFormdata] = useState({
+    productName: '',
+    sizes: [],
+    discountPrice: '',
+    mainPrice: '',
+    percentage: '',
+    collectionName: '',
+    description: '',
+    SKU: '',
+    availability: true,
+    categories: '',
+    tags: '',
+
   });
 
-  const [showModal, setShowModal] = useState(false);
-  const [fetchedImages, setFetchedImages] = useState([]);
-
-  const fetchImages = async () => {
-    try {
-      const response = await axios.get('https://api.camrosteel.com/api/v1/All-images');
-      setFetchedImages(response.data);
-    } catch (error) {
-      console.error('Failed to fetch images:', error);
-    }
-  };
-
   useEffect(() => {
-    fetchImages();
-  }, []);
+    const fetchMainData = async () => {
+      try {
+        const response = await axios.get(`https://www.api.naturalcottoncollection.com/api/get-products-name/${name}/${id}`);
+        const fetchedData = response.data.data;
+        console.log(fetchedData);
+        // Update formdata with fetched data
+        setFormdata({
+          productName: fetchedData.productName,
+          sizes: fetchedData.sizes, // Assuming sizes is an array
+          discountPrice: fetchedData.discountPrice,
+          mainPrice: fetchedData.mainPrice,
+          percentage: fetchedData.percentage,
+          collectionName: fetchedData.collectionName,
+          description: fetchedData.description,
+          SKU: fetchedData.SKU,
+          availability: fetchedData.availability,
+          // categories: fetchedData.categories,
+          tags: fetchedData.tags,
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    };
 
-
-  // const handleChange = (e) => {
-  //   const { name, value } = e.target;
-  //   if (name.includes('.')) {
-  //     const [parent, child] = name.split('.');
-  //     setFormData((prevData) => ({
-  //       ...prevData,
-  //       [parent]: {
-  //         ...prevData[parent],
-  //         [child]: value
-  //       }
-  //     }));
-  //   } else {
-  //     setFormData((prevData) => ({
-  //       ...prevData,
-  //       [name]: value
-  //     }));
-  //   }
-  //   console.log("i am call");
-  // };
-  const handleChange = (e) => {
+    fetchMainData();
+  }, [id, name]);
+  const handleChange = (e, index) => {
     const { name, value } = e.target;
-    if (name.startsWith("addInfo.")) {
-      const fieldName = name.split(".")[1]; // Extract the field name
-      setFormData((prevData) => ({
-        ...prevData,
-        addInfo: {
-          ...prevData.addInfo,
-          [fieldName]: value // Update the specific nested property
-        }
-      }));
+    if (name === 'size' || name === 'discountPrice' || name === 'mainPrice') {
+      const sizes = [...formdata.sizes];
+      sizes[index][name] = value;
+      setFormdata({
+        ...formdata,
+        sizes
+      });
+    } else if (name === 'file') {
+      setFormdata({
+        ...formdata,
+        [name]: e.target.files[0]
+      });
     } else {
-      setFormData((prevData) => ({
-        ...prevData,
+      setFormdata({
+        ...formdata,
         [name]: value
-      }));
+      });
     }
-    console.log("I am called");
-  };
-  
-  const handleSizeChange = (index, field, value) => {
-    const updatedSizes = [...formData.sizes];
-    updatedSizes[index][field] = value;
-    setFormData({ ...formData, sizes: updatedSizes });
   };
 
-  const addSize = () => {
-    setFormData({
-      ...formData,
-      sizes: [
-        ...formData.sizes,
-        {
-          id: formData.sizes.length,
-          size: "",
-          originalPrice: 0,
-          discoPrice: 0,
-        },
-      ],
+
+
+  const handleAddSize = () => {
+    setFormdata({
+      ...formdata,
+      sizes: [...formdata.sizes, { size: '', discountPrice: '', mainPrice: '', colors: { colorValue: '', stockNo: '' } }]
     });
   };
 
-  const removeSize = (index) => {
-    const updatedSizes = formData.sizes.filter((_, idx) => idx !== index);
-    setFormData({ ...formData, sizes: updatedSizes });
+  const handleRemoveSize = (index) => {
+    const sizes = [...formdata.sizes];
+    sizes.splice(index, 1);
+    setFormdata({
+      ...formdata,
+      sizes
+    });
   };
-
-  const handleImageClick = (imageUrl) => {
-    console.log(imageUrl); // Just for debugging, you can remove this line if not needed
-    setFormData(prevState => ({
-      ...prevState,
-      images: [...prevState.images, { img: imageUrl }]
+  const handleFileChange = (e) => {
+    const files = e.target.files;
+    setFormdata((prevProduct) => ({
+      ...prevProduct,
+      files: files
     }));
   };
 
+  const handleDiscountChange = (index, discountPercent) => {
+    // Check if discountPercent is a valid number
+    if (!isNaN(discountPercent) && discountPercent !== '') {
+      // Convert discountPercent to a number
+      const discountPercentage = parseFloat(discountPercent);
+      // Ensure discountPercentage is within valid range (0-100)
+      if (discountPercentage >= 0 && discountPercentage <= 100) {
+        const originalPrice = parseFloat(formdata.sizes[index].mainPrice);
+        const discountedPrice = originalPrice - (originalPrice * discountPercentage / 100);
+        const updatedSizes = [...formdata.sizes];
+        updatedSizes[index].discountPrice = discountedPrice.toFixed(2);
+        updatedSizes[index].discountPercent = discountPercentage;
+        setFormdata({ ...formdata, sizes: updatedSizes });
+      } else {
+        // Handle invalid discount percentage (outside of range)
+        // You can display a message or handle it based on your application's logic
+        console.error('Discount percentage must be between 0 and 100.');
+      }
+    } else {
+      // Handle invalid discount percentage (not a number)
+      // You can display a message or handle it based on your application's logic
+      console.error('Invalid discount percentage.');
+    }
+  };
 
-  const handleEdit = async(e)=>{
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-        const res = await axios.patch(`https://api.camrosteel.com/api/v1/update-product/${id}`,formData)
-        console.log(res.data)
-        toast.success("Product Updated Successfull")
-        window.location.reload()
-    } catch (error) {
-        console.log(error)
-    }
-  }
+    // const sizesJSON = JSON.stringify(formdata.sizes);
+    // // Create a new FormData object
+    // const formData = new FormData();
 
-  const singleProducts = async()=>{
+    // // Append other form data fields
+    // for (const key in formdata) {
+    //   if (formdata.hasOwnProperty(key) && key !== 'sizes' && key !== 'files') {
+    //     formData.append(key, formdata[key]);
+    //   }
+    // }
+    // formData.append('sizes', sizesJSON);
+    // // Append files to the FormData object
+    // if (formdata.files) {
+    //   Array.from(formdata.files).forEach((file, index) => {
+    //     formData.append('images', file);
+    //   });
+    // }
+
     try {
-        const response = await axios.post(`https://api.camrosteel.com/api/v1/single-product/${id}`)
-        console.log(response.data.data)
-        setFormData(response.data.data);
+      // Make Axios request
+      const response = await axios.patch(`https://www.api.naturalcottoncollection.com/api/update-products/${id}`, formdata, {
+        
+      });
+      alert("Product Updated")
+      console.log(response.data); // Assuming you want to log the response
     } catch (error) {
-        console.log(error)
+      console.error('Error:', error);
+      alert("Error in Updated")
+
     }
-  }
-  useEffect(()=>{
-    singleProducts()
-  },[id])
+  };
+
   const [tags, setTags] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('https://api.camrosteel.com/api/v1/get-tags');
+        const response = await axios.get('https://www.api.naturalcottoncollection.com/api/get-tags');
         setTags(response.data.data);
-        setIsLoading(false);
+
       } catch (error) {
         console.error('Failed to fetch tags:', error);
-        setIsLoading(false);
+
       }
     };
 
     fetchData();
   }, []);
-  const [categoriesList, setCategoriesList] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchDataCat = async () => {
       try {
-        const response = await axios.get('https://api.camrosteel.com/api/v1/get-categories');
-      
-        setCategoriesList(response.data.data);
+        const response = await axios.get(`https://www.api.naturalcottoncollection.com/api/get-category`);
+        console.log(response.data.data)
+        setCategories(response.data.data);
 
-   
+
         setIsLoading(false);
       } catch (error) {
         console.error('Failed to fetch categories:', error);
         setIsLoading(false); // Update loading state even if there's an error
       }
     };
-    
-    fetchData();
-  }, []);
-  const handleDiscountChange = (index, discountPercent) => {
-    const originalPrice = formData.sizes[index].originalPrice;
-    const discountedPrice = originalPrice - (originalPrice * discountPercent / 100);
-    handleSizeChange(index, 'discoPrice', discountedPrice); // Update discounted price
-    // Update discountPercent
-    const updatedSizes = [...formData.sizes];
-    updatedSizes[index].discountPercent = discountPercent;
-    setFormData({ ...formData, sizes: updatedSizes });
-  };
 
+    fetchDataCat();
+  }, []);
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
-      <h2 className="text-2xl font-bold mb-4">Create Product</h2>
-      <p>**For Edit Banner First upload Images in Upload-Images Tab</p>
-      <Link to="/upload" className="text-blue-400 underline">Upload-images</Link>
-      <form onSubmit={handleEdit} className="space-y-4">
+      <h2 className="text-2xl font-bold mb-4">Edit Product</h2>
+      {/* <p>**For Create Banner First upload Images in Upload-Images Tab</p> */}
+      {/* <Link to="/upload" className="text-blue-400 underline">Upload-images</Link> */}
+      <form onSubmit={handleSubmit} className="space-y-4">
         {/* Product Information */}
         <div className='flex w-ful items-center justify-center\l gap-2'>
-        
-        <div className='w-1/2'>
-        <input type="text" value={formData.productName} onChange={handleChange} name="productName" placeholder="Product Name" className="block w-full border-[1px] p-2 mt-1 rounded-md border-gray-900 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50" />
-        </div>
+
+          <div className='w-1/2'>
+            <input type="text" value={formdata.productName} onChange={handleChange} name="productName" placeholder="Product Name" className="block w-full border-[1px] p-2 mt-1 rounded-md border-gray-900 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50" />
+          </div>
+
           <div className='w-1/2'>
             <select
               id="tags"
               name="property"
-              value={formData.selectedTag}
+              value={formdata.tags}
               onChange={handleChange}
               className="block w-full border-[1px] p-2 mt-1 rounded-md border-gray-900 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
             >
               <option value="">Select a tag</option>
               {tags.map(tag => (
-                <option key={tag._id}  value={tag.title}>{tag.title}</option>
+                <option key={tag._id} value={tag.title}>{tag.title}</option>
               ))}
             </select>
-          </div>   
-          
-               </div>
-        {/* <div className='flex gap-2'>
-          <input type="text" value={formData.originalPrice} onChange={handleChange} name="originalPrice" placeholder="originalPrice" className="block w-full border-[1px] p-2 mt-1 rounded-md border-gray-900 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50" />
-          <input type="text" value={formData.discoPrice} onChange={handleChange} name="discoPrice" placeholder="discountPrice" className="block w-full border-[1px] p-2 mt-1 rounded-md border-gray-900 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50" />
+          </div>
+
+        </div>
+        {/* <div className="mb-4">
+          <input type="file" name="images"
+            multiple
+            className="block w-full border-[1px] p-2 mt-1 rounded-md border-gray-900 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+            onChange={handleFileChange} />
         </div> */}
         <div className='flex gap-2'>
-          <input type="text" value={formData.vendor} onChange={handleChange} name="vendor" placeholder="Vendor" className="block w-full border-[1px] p-2 mt-1 rounded-md border-gray-900 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50" />
-          <input type="text" value={formData.sku} onChange={handleChange} name="sku" placeholder="SKU" className="block w-full border-[1px] p-2 mt-1 rounded-md border-gray-900 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50" />
+          <input type="text" name="percentage" value={formdata.percentage} placeholder='Percentage' onChange={handleChange} className="block w-full border-[1px] p-2 mt-1 rounded-md border-gray-900 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50" />
+          <input type="text" name="collectionName" placeholder='Collection Name' value={formdata.collectionName} onChange={handleChange} className="block w-full border-[1px] p-2 mt-1 rounded-md border-gray-900 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50" />
         </div>
-        <div className='flex gap-2'>
-          <input type="text" value={formData.productType} onChange={handleChange} name="productType" placeholder="Product Type" className="block w-full border-[1px] p-2 mt-1 rounded-md border-gray-900 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50" />
-        </div>
+        {/* <div className='flex gap-2'>
+          <input type="text" name="categories" value={formdata.categories} onChange={handleChange} placeholder='Categories' className="block w-full border-[1px] p-2 mt-1 rounded-md border-gray-900 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50" />
+          <input type="text" value={formdata.SKU} onChange={handleChange} name="sku" placeholder="SKU" className="block w-full border-[1px] p-2 mt-1 rounded-md border-gray-900 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50" />
+        </div> */}
+        <div className='flex gap-2 justify-between'>
 
-        {/* Image Upload */}
+          <select onChange={handleChange} value={formdata.categories} name="categories" className='block w-[49%] border-[1px] p-2 mt-1 rounded-md border-gray-900 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50' id="">
+            <option value="">---select category---</option>
+            {categories && categories.map((item, index) => (
+              <option key={index} value={item.title}>
+                {item.title}
+              </option>
+            ))}
+          </select>
+
+
+          {/* <input type="text" name="categories" value={formdata.categories}} placeholder='Categories' className="block w-full border-[1px] p-2 mt-1 rounded-md border-gray-900 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50" /> */}
+          <input type="text" value={formdata.SKU} onChange={handleChange} name="SKU" placeholder="SKU" className="block w-[49%] border-[1px] p-2 mt-1 rounded-md border-gray-900 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50" />
+        </div>
+        <div className="mb-4">
+
+          <div className="mb-4">
+            <label className="capitalize block text-sm font-medium mb-1">Sizes:</label>
+            {formdata.sizes.map((size, index) => (
+              <div key={index} className="mb-4">
+                <div className="flex gap-2 items-center mb-2">
+                  <input
+                    type="text"
+                    name={`sizes[${index}].size`}
+                    value={size.size}
+                    onChange={(e) =>
+                      setFormdata((prevState) => ({
+                        ...prevState,
+                        sizes: prevState.sizes.map((s, i) =>
+                          i === index ? { ...s, size: e.target.value } : s
+                        ),
+                      }))
+                    }
+                    placeholder="Size"
+                    className="block w-full border-[1px] p-2 mt-1 rounded-md border-gray-900 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+                  />
+
+                  <input
+                    type="text"
+                    name={`sizes[${index}].mainPrice`}
+                    value={size.mainPrice}
+                    onChange={(e) =>
+                      setFormdata((prevState) => ({
+                        ...prevState,
+                        sizes: prevState.sizes.map((s, i) =>
+                          i === index ? { ...s, mainPrice: e.target.value } : s
+                        ),
+                      }))
+                    }
+                    placeholder="Main Price"
+                    className="block w-full border-[1px] p-2 mt-1 rounded-md border-gray-900 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+                  />
+
+                  <input
+                    type="text"
+                    name={`sizes[${index}].discountPrice`}
+                    value={size.discountPrice}
+                    onChange={(e) =>
+                      setFormdata((prevState) => ({
+                        ...prevState,
+                        sizes: prevState.sizes.map((s, i) =>
+                          i === index ? { ...s, discountPrice: e.target.value } : s
+                        ),
+                      }))
+                    }
+                    placeholder="Discount Price"
+                    className="block w-full border-[1px] p-2 mt-1 rounded-md border-gray-900 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+                  />
+
+                  <div className="w-1/2">
+
+                    <input
+                      type="text"
+                      id={`discountPercent_${index}`}
+                      value={size.discountPercent}
+                      onChange={(e) => handleDiscountChange(index, e.target.value)}
+                      name="percentage"
+                      placeholder="percentage %"
+                      className="w-32 block rounded-md border-gray-900 border-[1px] py-2 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveSize(index)}
+                    className="bg-red-500 whitespace-nowrap text-white px-2 py-1 rounded"
+                  >
+                    Remove Size
+                  </button>
+                </div>
+                <div className="grid gap-2 grid-cols-2">
+                  {/* <label className="capitalize block text-sm font-medium mb-1">Color:</label> */}
+                  <input
+                    type="text"
+                    name={`sizes[${index}].colors.colorValue`}
+                    value={size.colors.colorValue}
+                    onChange={(e) =>
+                      setFormdata((prevState) => ({
+                        ...prevState,
+                        sizes: prevState.sizes.map((s, i) =>
+                          i === index
+                            ? { ...s, colors: { ...s.colors, colorValue: e.target.value } }
+                            : s
+                        ),
+                      }))
+                    }
+                    placeholder="Color Value"
+                    className="block w-full border-[1px] p-2 mt-1 rounded-md border-gray-900 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+                  />
+                  <input
+                    type="text"
+                    name={`sizes[${index}].colors.stockNo`}
+                    value={size.colors.stockNo}
+                    onChange={(e) =>
+                      setFormdata((prevState) => ({
+                        ...prevState,
+                        sizes: prevState.sizes.map((s, i) =>
+                          i === index
+                            ? { ...s, colors: { ...s.colors, stockNo: e.target.value } }
+                            : s
+                        ),
+                      }))
+                    }
+                    placeholder="Stock No"
+                    className="block w-full border-[1px] p-2 mt-1 rounded-md border-gray-900 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+                  />
+                </div>
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={handleAddSize}
+              className="bg-blue-500 text-white px-2 py-1 rounded"
+            >
+              Add Size
+            </button>
+          </div>
+        </div>
+        {/* Image Upload
         <div className='flex  gap-2'>
         <div className='w-1/2'>
             <select
               id="Category"
               name="Category"
-              value={formData.Category}
+              value={formdata.Category}
               onChange={handleChange}
               className="block w-full border-[1px] p-2 mt-1 rounded-md border-gray-900 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
             >
@@ -247,22 +393,22 @@ const EditPoject = () => {
             </select>
           </div>   
           
-          <button type="button" value={formData.images} onClick={() => setShowModal(true)} name='images' className="block w-full border-[1px] p-2 mt-1 rounded-md border-gray-900 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50">
+          <button type="button" value={formdata.images} onClick={() => setShowModal(true)} name='images' className="block w-full border-[1px] p-2 mt-1 rounded-md border-gray-900 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50">
             Select Images
-          </button>   </div>
+          </button>   </div> */}
         {/* Additional Information */}
-        <div className='flex gap-2'>
-          <input type="text" value={formData.addInfo.base} onChange={handleChange} name="addInfo.base" placeholder="Base" className="block w-full mt-1 rounded-md border-gray-900 border-[1px] p-2 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50" />
-          <input type="text" value={formData.addInfo.material} onChange={handleChange} name="addInfo.material" placeholder="Material" className="block w-full mt-1 rounded-md border-gray-900 border-[1px] p-2 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50" />
-          <input type="text" value={formData.addInfo.dishwasherSafe} onChange={handleChange} name="addInfo.dishwasherSafe" placeholder="Dishwasher Safe" className="block w-full mt-1 rounded-md border-gray-900 border-[1px] p-2 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50" />
+        {/* <div className='flex gap-2'>
+          <input type="text" value={formdata.addInfo.base} onChange={handleChange} name="addInfo.base" placeholder="Base" className="block w-full mt-1 rounded-md border-gray-900 border-[1px] p-2 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50" />
+          <input type="text" value={formdata.addInfo.material} onChange={handleChange} name="addInfo.material" placeholder="Material" className="block w-full mt-1 rounded-md border-gray-900 border-[1px] p-2 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50" />
+          <input type="text" value={formdata.addInfo.dishwasherSafe} onChange={handleChange} name="addInfo.dishwasherSafe" placeholder="Dishwasher Safe" className="block w-full mt-1 rounded-md border-gray-900 border-[1px] p-2 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50" />
         </div>
         <div className='flex gap-2'>
-          <input type="text" value={formData.addInfo.packageContent} onChange={handleChange} name="addInfo.packageContent" placeholder="Package Content" className="block w-full mt-1 rounded-md border-gray-900 border-[1px] p-2 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50" />
-          <input type="number" value={formData.addInfo.warranty} onChange={handleChange} name="addInfo.warranty" placeholder="Warranty" className="block w-full mt-1 rounded-md border-gray-900 border-[1px] p-2 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50" />
-          <input type="text" value={formData.addInfo.certification} onChange={handleChange} name="addInfo.certification" placeholder="Certification" className="block w-full mt-1 rounded-md border-gray-900 border-[1px] p-2 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50" />
-        </div>
-        {
-          formData.sizes.map((size, index) => (
+          <input type="text" value={formdata.addInfo.packageContent} onChange={handleChange} name="addInfo.packageContent" placeholder="Package Content" className="block w-full mt-1 rounded-md border-gray-900 border-[1px] p-2 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50" />
+          <input type="number" value={formdata.addInfo.warranty} onChange={handleChange} name="addInfo.warranty" placeholder="Warranty" className="block w-full mt-1 rounded-md border-gray-900 border-[1px] p-2 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50" />
+          <input type="text" value={formdata.addInfo.certification} onChange={handleChange} name="addInfo.certification" placeholder="Certification" className="block w-full mt-1 rounded-md border-gray-900 border-[1px] p-2 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50" />
+        </div> */}
+        {/* {
+          formdata.sizes.map((size, index) => (
             <div key={index} className="flex w-full space-x-4 items-center">
               <div className='w-1/2'>
                 <label htmlFor={`size_${index}`}>Size:</label>
@@ -291,16 +437,19 @@ const EditPoject = () => {
               <button type="button" onClick={() => removeSize(index)} className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:ring focus:ring-red-500 focus:ring-opacity-50">Remove</button>
             </div>
           ))
-        }
+        } */}
+        <div>
+          <textarea value={formdata.description} onChange={handleChange} name="description" placeholder="description" className="block w-full mt-1 rounded-md border-gray-900 border-[1px] p-2 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50" />
 
+        </div>
 
-        <button type="button" onClick={addSize} className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-500 focus:ring-opacity-50">Add Size</button>
-        <textarea value={formData.Desc} onChange={handleChange} name="Desc" placeholder="Description" className="block w-full mt-1 rounded-md border-gray-900 border-[1px] p-2 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50" />
+        {/* <button type="button" onClick={addSize} className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-500 focus:ring-opacity-50">Add Size</button>
+        <textarea value={formdata.Desc} onChange={handleChange} name="Desc" placeholder="Description" className="block w-full mt-1 rounded-md border-gray-900 border-[1px] p-2 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50" /> */}
 
         <button type="submit" className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 focus:outline-none focus:ring focus:ring-green-500 focus:ring-opacity-50">Submit</button>
       </form>
-      <ImageModal isOpen={showModal} onClose={() => setShowModal(false)} images={fetchedImages} handleImageClick={handleImageClick} />    </div>
+    </div>
   );
 };
 
-export default EditPoject;
+export default EditProject;

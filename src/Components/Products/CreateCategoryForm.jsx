@@ -35,7 +35,7 @@ const CreateCategoryForm = () => {
       formDataToSend.append('images', formData.file); // Append file
       console.log(formDataToSend)
       const response = await axios.post(
-        "http://localhost:4000/api/create-category",
+        "https://www.api.naturalcottoncollection.com/api/create-category",
         formDataToSend,{
           headers: {
             'Content-Type': 'multipart/form-data'

@@ -8,7 +8,7 @@ const AllImages = () => {
 
     const fetchImages = async () => {
         try {
-            const response = await axios.get('https://api.camrosteel.com/api/v1/All-images');
+            const response = await axios.get('https://www.api.naturalcottoncollection.com/api/All-images');
             setFetchedImages(response.data.reverse());
 
         } catch (error) {
@@ -24,7 +24,7 @@ const AllImages = () => {
         try {
             console.log(imageId, albumId)
             // Send DELETE request to delete the image
-            const res = await axios.delete(`https://api.camrosteel.com/api/v1/image/${imageId}`);
+            const res = await axios.delete(`https://www.api.naturalcottoncollection.com/api/image/${imageId}`);
             // After successful deletion, update state to reflect changes
             console.log(res.data)
             fetchImages();

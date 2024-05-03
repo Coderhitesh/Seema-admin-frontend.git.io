@@ -24,7 +24,7 @@ const ImageUpload = () => {
         formData.append('images', file);
       });
 
-      const response = await axios.post('https://api.camrosteel.com/api/v1/image', formData, {
+      const response = await axios.post('https://www.api.naturalcottoncollection.com/api/image', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
