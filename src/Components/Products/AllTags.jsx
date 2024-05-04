@@ -24,7 +24,7 @@ const AllTags = () => {
 
     const handleDeleteTag = async (id) => {
         try {
-            await axios.post(`https://www.api.naturalcottoncollection.com/api/delete-tags/${id}`);
+            await axios.delete(`https://www.api.naturalcottoncollection.com/api/delete-tags/${id}`);
             // Update tags after successful deletion
             setTags(tags.filter(tag => tag._id !== id));
             toast.success('Tag deleted successfully:')
