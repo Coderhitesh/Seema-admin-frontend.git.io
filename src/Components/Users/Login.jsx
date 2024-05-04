@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import logo from './diva_story-removebg-preview.2b4e12b55daf34b25de5.webp';
+import logo from './logo.png';
 import toast from 'react-hot-toast'
 const Logins = () => {
   const [Email, setEmail] = useState('');
