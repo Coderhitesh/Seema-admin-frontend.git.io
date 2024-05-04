@@ -21,6 +21,7 @@ const CategorySlider = () => {
             const response = await axios.get("https://www.api.naturalcottoncollection.com/api/getAllCategorey")
             console.log(response.data);
             setCateg(response.data)
+            
         } catch (error) {
             console.log(error);
         }

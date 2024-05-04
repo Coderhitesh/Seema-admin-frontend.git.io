@@ -29,6 +29,7 @@ const AllTags = () => {
             setTags(tags.filter(tag => tag._id !== id));
             toast.success('Tag deleted successfully:')
         } catch (error) {
+            toast.error('Internal error')
             console.error('Error deleting tag:', error);
             // Implement error handling, such as displaying an error message to the user
         }

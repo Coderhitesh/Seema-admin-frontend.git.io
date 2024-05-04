@@ -121,8 +121,10 @@ const CreateProduct = () => {
         }
       });
       console.log(response.data); // Assuming you want to log the response
+      toast.success('Product Added Successfully')
     } catch (error) {
       console.error('Error:', error);
+      toast.error("An Error Occurred")
     }
   };
 

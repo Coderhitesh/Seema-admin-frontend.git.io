@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import toast from 'react-hot-toast';
 
 const ImageUpload = () => {
   const [selectedFiles, setSelectedFiles] = useState([]);
@@ -29,7 +30,7 @@ const ImageUpload = () => {
           'Content-Type': 'multipart/form-data'
         }
       });
-
+      toast.success('Product Updated')
       setMessage(response.data.message);
     } catch (error) {
       setMessage('An error occurred while uploading the images.');

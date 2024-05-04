@@ -150,11 +150,13 @@ const EditProject = () => {
       const response = await axios.patch(`https://www.api.naturalcottoncollection.com/api/update-products/${id}`, formdata, {
         
       });
-      alert("Product Updated")
+      // alert("Product Updated")
       console.log(response.data); // Assuming you want to log the response
+      toast.success('Product Updated')
     } catch (error) {
+      toast.error('Error in Updating')
       console.error('Error:', error);
-      alert("Error in Updated")
+      // alert("Error in Updated")
 
     }
   };

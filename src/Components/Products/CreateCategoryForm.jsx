@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const CreateCategoryForm = () => {
   const [formData, setFormData] = useState({
@@ -42,9 +43,12 @@ const CreateCategoryForm = () => {
           }
         }
       );
+      toast.success('Category Created')
       console.log(response.data);
       setMessage("Category created successfully!");
+
     } catch (error) {
+      toast.error('Internal Error')
       console.error("Error creating banner:", error);
       setMessage("Error creating banner. Please try again.");
     }
@@ -81,7 +85,7 @@ const CreateCategoryForm = () => {
           type="submit"
           className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
         >
-          Create Banner
+          Create Category
         </button>
       </form>
       {message && <p className="mt-4 text-green-600">{message}</p>}

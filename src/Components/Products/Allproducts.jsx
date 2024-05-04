@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const Allproducts = () => {
   const [products, setProducts] = useState([]);
@@ -29,8 +30,10 @@ const Allproducts = () => {
       const res = await axios.delete(`https://www.api.naturalcottoncollection.com/api/delete-products/${id}`)
       console.log(res.data)
       setProducts(products.filter(products => products._id !== id));
+      toast.success('Product Deleted')
     } catch (error) {
-
+      console.log(error)
+      toast.error('Internal Error')
     }
   }
   // Logic to paginate products

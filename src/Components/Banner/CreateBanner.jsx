@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const CreateBanner = () => {
   const [formData, setFormData] = useState({
@@ -44,8 +45,10 @@ const CreateBanner = () => {
         }
       );
       console.log(response.data);
+      toast.success('Banner Created')
       setMessage("Banner created successfully!");
     } catch (error) {
+      toast.error('Server Error')
       console.error("Error creating banner:", error);
       setMessage("Error creating banner. Please try again.");
     }

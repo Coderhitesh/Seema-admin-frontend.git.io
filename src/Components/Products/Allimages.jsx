@@ -1,5 +1,6 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 
 const AllImages = () => {
     const [fetchedImages, setFetchedImages] = useState([]);
@@ -27,8 +28,10 @@ const AllImages = () => {
             const res = await axios.delete(`https://www.api.naturalcottoncollection.com/api/image/${imageId}`);
             // After successful deletion, update state to reflect changes
             console.log(res.data)
+            toast.success('Image Deleted')
             fetchImages();
         } catch (error) {
+            toast.error('Internal Error')
             console.error('Failed to delete image:', error);
         }
     };

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 const AllCategories = () => {
   const [categories, setCategories] = useState([]);
@@ -36,8 +37,10 @@ const AllCategories = () => {
       console.log('Category deleted successfully:', id);
       console.log(response.data);
       fetchData();
+      toast.success('Category Deleted')
       // Implement any additional actions after successful deletion
     } catch (error) {
+      toast.error('Internal Error')
       console.error('Error deleting category:', error);
       // Implement error handling, such as displaying an error message to the user
     }
