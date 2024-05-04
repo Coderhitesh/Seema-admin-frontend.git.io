@@ -6,21 +6,21 @@ import toast from 'react-hot-toast';
 const AllCategories = () => {
   const [categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const fetchData = async () => {
+    try {
+      const response = await axios.get('https://www.api.naturalcottoncollection.com/api/get-category');
+    
+        setCategories(response.data.data);
 
+ 
+      setIsLoading(false);
+    } catch (error) {
+      console.error('Failed to fetch categories:', error);
+      setIsLoading(false); // Update loading state even if there's an error
+    }
+  };
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get('https://www.api.naturalcottoncollection.com/api/get-category');
-      
-          setCategories(response.data.data);
-
-   
-        setIsLoading(false);
-      } catch (error) {
-        console.error('Failed to fetch categories:', error);
-        setIsLoading(false); // Update loading state even if there's an error
-      }
-    };
+  
     
     fetchData();
   }, []);
@@ -33,7 +33,7 @@ const AllCategories = () => {
 
   const handleDeleteCategory = async (id) => {
     try {
-      const response = await axios.post(`https://www.api.naturalcottoncollection.com/api/delete-category/${id}`);
+      const response = await axios.delete(`https://www.api.naturalcottoncollection.com/api/delete-category/${id}`);
       console.log('Category deleted successfully:', id);
       console.log(response.data);
       fetchData();
