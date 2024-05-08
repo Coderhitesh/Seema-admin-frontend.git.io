@@ -4,6 +4,7 @@ import ImageModal from './ImageModal';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast'
 const CreateProduct = () => {
+  const [load,setLoad] = useState(false)
   const [formdata, setFormdata] = useState({
     productName: '',
     sizes: [],
@@ -104,6 +105,7 @@ const CreateProduct = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoad(true)
     const sizesJSON = JSON.stringify(formdata.sizes);
     // Create a new FormData object
     const formData = new FormData();
@@ -131,9 +133,12 @@ const CreateProduct = () => {
       });
       console.log(response.data); // Assuming you want to log the response
       toast.success('Product Added Successfully')
+      setLoad(false)
     } catch (error) {
       console.error('Error:', error);
       toast.error("An Error Occurred")
+      setLoad(false)
+
     }
   };
 
@@ -424,7 +429,7 @@ const CreateProduct = () => {
         {/* <button type="button" onClick={addSize} className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-500 focus:ring-opacity-50">Add Size</button>
         <textarea value={formdata.Desc} onChange={handleChange} name="Desc" placeholder="Description" className="block w-full mt-1 rounded-md border-gray-900 border-[1px] p-2 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50" /> */}
 
-        <button type="submit" className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 focus:outline-none focus:ring focus:ring-green-500 focus:ring-opacity-50">Submit</button>
+        <button type="submit" className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 focus:outline-none focus:ring focus:ring-green-500 focus:ring-opacity-50">{load ? 'Please Wait':'submit'}</button>
       </form>
     </div>
   );
