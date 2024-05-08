@@ -4,6 +4,7 @@ import ImageModal from './ImageModal';
 import { Link, useParams } from 'react-router-dom';
 import toast from 'react-hot-toast'
 const EditProject = () => {
+  const [load,setLoad] = useState(false)
   const [mainData, setMainData] = useState([])
   const { id, name } = useParams()
 
@@ -116,17 +117,26 @@ const EditProject = () => {
         // Handle invalid discount percentage (outside of range)
         // You can display a message or handle it based on your application's logic
         console.error('Discount percentage must be between 0 and 100.');
+        const updatedSizes = [...formdata.sizes];
+        updatedSizes[index].discountPrice = ''; // Clear discount price
+        updatedSizes[index].discountPercent = ''; // Clear discount percent
+        setFormdata({ ...formdata, sizes: updatedSizes });
       }
     } else {
       // Handle invalid discount percentage (not a number)
       // You can display a message or handle it based on your application's logic
       console.error('Invalid discount percentage.');
+      const updatedSizes = [...formdata.sizes];
+      updatedSizes[index].discountPrice = ''; // Clear discount price
+      updatedSizes[index].discountPercent = ''; // Clear discount percent
+      setFormdata({ ...formdata, sizes: updatedSizes });
     }
   };
 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoad(true)
     // const sizesJSON = JSON.stringify(formdata.sizes);
     // // Create a new FormData object
     // const formData = new FormData();
@@ -153,6 +163,7 @@ const EditProject = () => {
       // alert("Product Updated")
       console.log(response.data); // Assuming you want to log the response
       toast.success('Product Updated')
+      setLoad(false)
     } catch (error) {
       toast.error('Error in Updating')
       console.error('Error:', error);
@@ -213,7 +224,7 @@ const EditProject = () => {
           <div className='w-1/2'>
             <select
               id="tags"
-              name="property"
+              name="tags"
               value={formdata.tags}
               onChange={handleChange}
               className="block w-full border-[1px] p-2 mt-1 rounded-md border-gray-900 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
@@ -448,7 +459,7 @@ const EditProject = () => {
         {/* <button type="button" onClick={addSize} className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-500 focus:ring-opacity-50">Add Size</button>
         <textarea value={formdata.Desc} onChange={handleChange} name="Desc" placeholder="Description" className="block w-full mt-1 rounded-md border-gray-900 border-[1px] p-2 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50" /> */}
 
-        <button type="submit" className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 focus:outline-none focus:ring focus:ring-green-500 focus:ring-opacity-50">Submit</button>
+        <button type="submit" className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 focus:outline-none focus:ring focus:ring-green-500 focus:ring-opacity-50">{load ? 'Please Wait':'submit'}</button>
       </form>
     </div>
   );
