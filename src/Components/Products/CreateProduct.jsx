@@ -84,13 +84,22 @@ const CreateProduct = () => {
         // Handle invalid discount percentage (outside of range)
         // You can display a message or handle it based on your application's logic
         console.error('Discount percentage must be between 0 and 100.');
+        const updatedSizes = [...formdata.sizes];
+        updatedSizes[index].discountPrice = ''; // Clear discount price
+        updatedSizes[index].discountPercent = ''; // Clear discount percent
+        setFormdata({ ...formdata, sizes: updatedSizes });
       }
     } else {
       // Handle invalid discount percentage (not a number)
       // You can display a message or handle it based on your application's logic
       console.error('Invalid discount percentage.');
+      const updatedSizes = [...formdata.sizes];
+      updatedSizes[index].discountPrice = ''; // Clear discount price
+      updatedSizes[index].discountPercent = ''; // Clear discount percent
+      setFormdata({ ...formdata, sizes: updatedSizes });
     }
   };
+  
 
 
   const handleSubmit = async (e) => {
@@ -180,7 +189,7 @@ const CreateProduct = () => {
           <div className='w-1/2'>
             <select
               id="tags"
-              name="property"
+              name="tags"
               value={formdata.tags}
               onChange={handleChange}
               className="block w-full border-[1px] p-2 mt-1 rounded-md border-gray-900 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
