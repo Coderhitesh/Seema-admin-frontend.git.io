@@ -21,6 +21,7 @@ import EditPoject from "../Components/Products/EditP"
 import CreateCategoryForm from "../Components/Products/CreateCategoryForm"
 import AllTags from "../Components/Products/AllTags"
 import CreateTags from "../Components/Products/CreateTags"
+import ShipLogin from "../Components/ShipLogin/ShipLogin"
 const Home = () => {
   return (
     <div className="w-full flex">
@@ -55,6 +56,10 @@ const Home = () => {
             <Route path="/Categories" element={<AllCategories/>} />
             <Route path="/All-user" element={<User/>} />
             <Route path="/Contact-Request" element={<ContactRequest/>} />
+
+            <Route path="/Ship-login" element={<ShipLogin />} />
+            <Route path="/Change-Order-Status/:id" element={<Shipped />} />
+
 
 
 
